@@ -59,6 +59,27 @@ Part of the [ThirdKey](https://thirdkey.ai) trust stack: **SchemaPin → AgentPi
 
 ## Quick Start — Desktop Only (5 min)
 
+One command to clone, configure, and start your agent fleet:
+
+```bash
+curl -fsSL https://symbiont.dev/install.sh | bash
+```
+
+The installer checks prerequisites, generates an auth token, prompts for your LLM API key, pulls Docker images, and starts the stack.
+
+**Options:**
+
+```bash
+# Install to a custom directory
+curl -fsSL https://symbiont.dev/install.sh | bash -s -- --dir ~/my-fleet
+
+# Clone and configure only, don't start services
+curl -fsSL https://symbiont.dev/install.sh | bash -s -- --no-start
+```
+
+<details>
+<summary>Manual setup (without the installer)</summary>
+
 ```bash
 # 1. Clone and enter the repo
 git clone https://github.com/thirdkeyai/symbi-hybrid-stack.git
@@ -76,6 +97,8 @@ make desktop-up
 # 5. Verify everything is healthy
 make verify
 ```
+
+</details>
 
 Your agent fleet is now running at `http://localhost:8081`. The coordinator manages task routing, health monitoring, and audit logging.
 
