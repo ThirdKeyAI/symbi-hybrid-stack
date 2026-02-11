@@ -1,0 +1,83 @@
+services:
+  symbi:
+    image: ghcr.io/thirdkeyai/symbi:latest
+    container_name: symbi-coordinator
+    restart: unless-stopped
+    ports:
+      - "${SYMBI_GRPC_PORT:-8080}:8080"
+      - "${SYMBI_HTTP_PORT:-8081}:8081"
+    environment:
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
+      - OPENROUTER_MODEL=${OPENROUTER_MODEL:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - CHAT_MODEL=${CHAT_MODEL:-}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - ANTHROPIC_MODEL=${ANTHROPIC_MODEL:-}
+      - SYMBI_AUTH_TOKEN=${SYMBI_AUTH_TOKEN}
+    volumes:
+      - symbi-data:/var/lib/symbi
+      - ./agents:/etc/symbi/agents:ro
+      - ./symbi.toml:/etc/symbi/symbi.toml:ro
+      - ./policies:/etc/symbi/policies:ro
+    command:
+      - "up"
+      - "--port"
+      - "8080"
+      - "--http-port"
+      - "8081"
+      - "--http.token"
+      - "env:SYMBI_AUTH_TOKEN"
+      - "--http.audit"
+    healthcheck:
+      test: ["CMD", "symbi", "--version"]
+      interval: 30s
+      timeout: 10s
+      start_period: 10s
+      retries: 3
+    networks:
+      - symbi-net
+    depends_on:
+      qdrant:
+        condition: service_healthy
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: symbi-qdrant
+    restart: unless-stopped
+    ports:
+      - "${QDRANT_PORT:-6333}:6333"
+    volumes:
+      - qdrant-data:/qdrant/storage
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:6333/healthz || exit 1"]
+      interval: 30s
+      timeout: 10s
+      start_period: 5s
+      retries: 3
+    networks:
+      - symbi-net
+
+  litestream:
+    image: litestream/litestream:latest
+    container_name: symbi-litestream
+    restart: unless-stopped
+    volumes:
+      - symbi-data:/var/lib/symbi
+      - ./litestream.yml:/etc/litestream.yml:ro
+    command: ["replicate"]
+    depends_on:
+      symbi:
+        condition: service_healthy
+    networks:
+      - symbi-net
+
+volumes:
+  symbi-data:
+    name: symbi-data
+  qdrant-data:
+    name: symbi-qdrant-data
+
+networks:
+  symbi-net:
+    name: symbi-network
+    driver: bridge

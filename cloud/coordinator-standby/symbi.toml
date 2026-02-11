@@ -1,0 +1,21 @@
+# Symbiont Runtime Configuration — Cloud Standby
+
+[runtime]
+mode = "production"
+hot_reload = false
+
+[http]
+enabled = true
+port = 8081
+path = "/webhook"
+cors = false
+audit = true
+max_body_bytes = 1048576   # 1 MB
+
+[storage]
+type = "sqlite"
+path = "/var/lib/symbi/symbi.db"   # ephemeral on Cloud Run
+
+[logging]
+level = "info"
+format = "json"   # structured for Cloud Logging

@@ -1,0 +1,31 @@
+# State Synchronization Configuration
+# Litestream replicates the SQLite database to GCS for cloud failover.
+
+[replication]
+# GCS bucket for state replication (set via GCS_STATE_BUCKET env var)
+bucket = "${GCS_STATE_BUCKET}"
+path = "state/symbi.db"
+
+# Sync interval — how often Litestream snapshots
+sync_interval = "1s"
+
+# Retention — how long to keep old snapshots
+retention = "72h"
+retention_check_interval = "1h"
+
+[conflict_resolution]
+# Desktop is always authoritative when both are running
+strategy = "desktop-primary"
+
+# If cloud writes conflict with a newer desktop snapshot, discard cloud writes
+on_conflict = "prefer-desktop"
+
+# Grace period before cloud assumes desktop is down
+failover_timeout = "30s"
+
+[monitoring]
+# Log replication status
+log_level = "info"
+
+# Alert if replication lag exceeds threshold
+lag_alert_threshold = "10s"

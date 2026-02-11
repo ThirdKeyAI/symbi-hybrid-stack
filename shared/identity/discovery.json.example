@@ -1,0 +1,20 @@
+{
+  "schema_version": "0.2.0",
+  "domain": "example.com",
+  "agents": [
+    {
+      "agent_id": "coordinator",
+      "display_name": "Fleet Coordinator",
+      "public_key_jwk": {
+        "kty": "EC",
+        "crv": "P-256",
+        "x": "PLACEHOLDER_X_COORDINATE",
+        "y": "PLACEHOLDER_Y_COORDINATE",
+        "kid": "fleet-key-01"
+      },
+      "capabilities": ["agent_coordination", "task_routing", "health_monitoring"],
+      "credential_endpoint": "https://example.com/.well-known/agentpin/credentials/coordinator.jwt"
+    }
+  ],
+  "trust_bundle_url": "https://example.com/.well-known/agentpin/trust-bundle.json"
+}

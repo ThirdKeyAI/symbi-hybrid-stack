@@ -1,0 +1,9 @@
+dbs:
+  - path: /var/lib/symbi/symbi.db
+    replicas:
+      - type: gcs
+        bucket: ${GCS_STATE_BUCKET}
+        path: state/symbi.db
+        sync-interval: 1s
+        retention: 72h
+        retention-check-interval: 1h

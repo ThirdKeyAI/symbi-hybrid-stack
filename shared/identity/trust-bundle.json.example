@@ -1,0 +1,38 @@
+{
+  "schema_version": "0.2.0",
+  "domain": "example.com",
+  "issued_at": "2025-01-01T00:00:00Z",
+  "public_keys": [
+    {
+      "kty": "EC",
+      "crv": "P-256",
+      "x": "PLACEHOLDER_X_COORDINATE",
+      "y": "PLACEHOLDER_Y_COORDINATE",
+      "kid": "fleet-key-01",
+      "use": "sig",
+      "alg": "ES256"
+    }
+  ],
+  "agents": [
+    {
+      "agent_id": "coordinator",
+      "kid": "fleet-key-01",
+      "capabilities": ["agent_coordination", "task_routing", "health_monitoring"]
+    },
+    {
+      "agent_id": "compliance_checker",
+      "kid": "fleet-key-01",
+      "capabilities": ["compliance_scanning", "report_generation"]
+    },
+    {
+      "agent_id": "chat_responder",
+      "kid": "fleet-key-01",
+      "capabilities": ["chat_response", "status_reporting"]
+    },
+    {
+      "agent_id": "data_processor",
+      "kid": "fleet-key-01",
+      "capabilities": ["data_ingestion", "transformation", "output_routing"]
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+# Cloudflare Tunnel configuration
+# Copy to config.yml and fill in your values.
+#
+# See: https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/configure-tunnels/
+
+tunnel: YOUR_TUNNEL_ID
+credentials-file: /home/user/.cloudflared/YOUR_TUNNEL_ID.json
+
+ingress:
+  # Symbi HTTP API
+  - hostname: agents.yourdomain.com
+    service: http://localhost:8081
+    originRequest:
+      noTLSVerify: false
+
+  # Qdrant (optional — usually internal only)
+  # - hostname: qdrant.yourdomain.com
+  #   service: http://localhost:6333
+
+  # Catch-all: return 404 for unmatched routes
+  - service: http_status:404

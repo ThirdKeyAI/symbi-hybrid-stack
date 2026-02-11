@@ -1,0 +1,33 @@
+# Environment and secrets
+.env
+*.env.local
+secrets/
+*.pem
+*.jwk
+*.jwt
+trust-anchors/
+
+# State and data
+*.db
+*.db-wal
+*.db-shm
+/state/
+/logs/
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
+terraform.tfvars
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~

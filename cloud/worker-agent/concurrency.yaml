@@ -1,0 +1,22 @@
+# Worker Concurrency Model
+#
+# Workers use containerConcurrency=1 because each agent invocation:
+#
+# 1. Makes LLM API calls that consume significant memory for context windows
+# 2. May run long-running transformations (up to 15 minutes timeout)
+# 3. Needs isolated state per task to prevent cross-contamination
+# 4. Benefits from full CPU allocation per request
+#
+# With concurrency=1, Cloud Run scales horizontally instead:
+# - Each new task gets its own container instance
+# - max-instances=10 caps cost while allowing burst
+# - Idle instances scale to zero (no cost when unused)
+#
+# Trade-offs:
+# - Higher cold-start latency (new container per task)
+# - More instances = higher cost during burst
+# - Simpler reasoning about state and resource usage
+#
+# If your agents are lightweight (fast responses, small context),
+# consider increasing containerConcurrency to 5-10 for better
+# cost efficiency at the expense of per-request resources.

@@ -1,0 +1,60 @@
+name: Validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  shellcheck:
+    name: ShellCheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install shellcheck
+        run: sudo apt-get install -y shellcheck
+      - name: Lint shell scripts
+        run: |
+          find . -name '*.sh' -type f | xargs shellcheck --severity=warning
+
+  yamllint:
+    name: YAML Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install yamllint
+        run: pip install yamllint
+      - name: Lint YAML files
+        run: |
+          yamllint -d relaxed \
+            desktop/docker-compose.yml \
+            desktop/litestream.yml \
+            cloud/coordinator-standby/cloudbuild.yaml \
+            cloud/coordinator-standby/service.yaml \
+            cloud/worker-agent/service.yaml
+
+  terraform:
+    name: Terraform Validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.5"
+      - name: Terraform init
+        working-directory: cloud/terraform
+        run: terraform init -backend=false
+      - name: Terraform validate
+        working-directory: cloud/terraform
+        run: terraform validate
+
+  compose:
+    name: Docker Compose Config
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate compose file
+        env:
+          SYMBI_AUTH_TOKEN: test-token
+        run: docker compose -f desktop/docker-compose.yml config --quiet

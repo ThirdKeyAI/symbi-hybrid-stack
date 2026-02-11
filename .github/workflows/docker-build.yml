@@ -1,0 +1,32 @@
+name: Docker Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-coordinator:
+    name: Build Coordinator Image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build coordinator-standby
+        run: |
+          docker build \
+            -f cloud/coordinator-standby/Dockerfile \
+            -t coordinator-standby:test \
+            .
+
+  build-worker:
+    name: Build Worker Image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build worker-agent
+        run: |
+          docker build \
+            -f cloud/worker-agent/Dockerfile \
+            -t worker-agent:test \
+            .
