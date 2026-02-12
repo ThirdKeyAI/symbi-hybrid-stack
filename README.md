@@ -13,11 +13,11 @@ Part of the [ThirdKey](https://thirdkey.ai) trust stack: **SchemaPin → AgentPi
 │  ┌──────────── Desktop (primary) ────────────┐                  │
 │  │                                           │                  │
 │  │  Docker Compose                           │                  │
-│  │  ┌─────────┐ ┌────────┐ ┌────────────┐   │                   │
-│  │  │  Symbi  │ │ Qdrant │ │ Litestream │   │                   │
-│  │  │ :8080/  │ │ :6333  │ │ SQLite→GCS │   │                   │
-│  │  │  8081   │ │        │ │            │   │                   │
-│  │  └────┬────┘ └────────┘ └────────────┘   │                   │
+│  │  ┌─────────┐ ┌────────┐ ┌────────────┐    │                  │
+│  │  │  Symbi  │ │ Qdrant │ │ Litestream │    │                  │
+│  │  │ :8080/  │ │ :6333  │ │ SQLite→GCS │    │                  │
+│  │  │  8081   │ │        │ │            │    │                  │
+│  │  └────┬────┘ └────────┘ └────────────┘    │                  │
 │  │       │                                   │                  │
 │  │  ┌────┴──────────┐                        │                  │
 │  │  │  Cloudflare   │                        │                  │
