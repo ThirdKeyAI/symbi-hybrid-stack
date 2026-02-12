@@ -13,6 +13,12 @@ ingress:
     originRequest:
       noTLSVerify: false
 
+  # Operations Console (optional)
+  # - hostname: console.yourdomain.com
+  #   service: http://localhost:3001
+  #   originRequest:
+  #     noTLSVerify: false
+
   # Qdrant (optional — usually internal only)
   # - hostname: qdrant.yourdomain.com
   #   service: http://localhost:6333

@@ -14,6 +14,7 @@ fi
 
 HTTP_PORT="${SYMBI_HTTP_PORT:-8081}"
 QDRANT_PORT="${QDRANT_PORT:-6333}"
+A2UI_PORT="${A2UI_PORT:-3001}"
 TOKEN="${SYMBI_AUTH_TOKEN:-}"
 
 STATUS_OK=0
@@ -53,6 +54,9 @@ fi
 
 # Check Qdrant
 check_service "qdrant" "curl -sf http://localhost:${QDRANT_PORT}/healthz"
+
+# Check Operations Console
+check_service "a2ui" "curl -sf -o /dev/null http://localhost:${A2UI_PORT}/"
 
 # Check Litestream container
 check_service "litestream" "docker inspect --format='{{.State.Running}}' symbi-litestream 2>/dev/null | grep -q true"
