@@ -1,8 +1,9 @@
 FROM ghcr.io/thirdkeyai/symbi:latest
 
 # Copy agent definitions and policies
-COPY ../../desktop/agents/ /etc/symbi/agents/
-COPY ../../desktop/policies/ /etc/symbi/policies/
+# Build context is repo root (docker build -f cloud/worker-agent/Dockerfile .)
+COPY desktop/agents/ /etc/symbi/agents/
+COPY desktop/policies/ /etc/symbi/policies/
 
 # Workers process tasks from queue — no HTTP endpoint needed
 # Cloud Run requires a port listener, so we keep the HTTP server

@@ -58,7 +58,7 @@ if [ -z "${SYMBI_AUTH_TOKEN:-}" ]; then
     TOKEN="symbi_$(openssl rand -hex 24)"
     # Append token to .env
     if grep -q "^SYMBI_AUTH_TOKEN=" .env; then
-        sed -i "s|^SYMBI_AUTH_TOKEN=.*|SYMBI_AUTH_TOKEN=${TOKEN}|" .env
+        sed -i "s|^SYMBI_AUTH_TOKEN=.*|SYMBI_AUTH_TOKEN=${TOKEN}|" .env 2>/dev/null || sed -i '' "s|^SYMBI_AUTH_TOKEN=.*|SYMBI_AUTH_TOKEN=${TOKEN}|" .env
     else
         echo "SYMBI_AUTH_TOKEN=${TOKEN}" >> .env
     fi
