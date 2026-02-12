@@ -1,0 +1,6 @@
+{
+  "agentpin_revocations_version": "1.0.0",
+  "issuer": "example.com",
+  "updated_at": "2025-01-01T00:00:00Z",
+  "revocations": []
+}

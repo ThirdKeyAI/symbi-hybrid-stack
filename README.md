@@ -175,8 +175,10 @@ See `shared/agents/README.md` for the DSL capabilities reference.
 
 Every agent in the fleet has a cryptographic identity via [AgentPin](https://agentpin.org):
 
-- **ES256 keypairs** anchored to your domain via `.well-known/agent-identity.json`
-- **Trust bundles** for air-gapped verification
+- **ES256 keypairs** with five discovery methods: trust bundles, local directories, chain resolvers, offline mode, and online `.well-known` endpoints
+- **TOFU key pinning** records public keys on first contact and rejects unexpected changes
+- **Three-level revocation** — per-credential, per-key, per-issuer — with offline and online distribution
+- **Trust bundles** for air-gapped and enterprise verification
 - **Audit logging** of all agent actions with credential chains
 - **Policy DSL** for network egress, secret access, and audit rules
 

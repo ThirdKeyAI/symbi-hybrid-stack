@@ -5,6 +5,7 @@ secrets/
 *.pem
 *.jwk
 *.jwt
+pin-store.json
 trust-anchors/
 
 # State and data

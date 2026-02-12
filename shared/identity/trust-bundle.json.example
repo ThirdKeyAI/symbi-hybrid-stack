@@ -1,38 +1,69 @@
 {
-  "schema_version": "0.2.0",
-  "domain": "example.com",
-  "issued_at": "2025-01-01T00:00:00Z",
-  "public_keys": [
+  "agentpin_bundle_version": "1.0.0",
+  "created_at": "2025-01-01T00:00:00Z",
+  "documents": [
     {
-      "kty": "EC",
-      "crv": "P-256",
-      "x": "PLACEHOLDER_X_COORDINATE",
-      "y": "PLACEHOLDER_Y_COORDINATE",
-      "kid": "fleet-key-01",
-      "use": "sig",
-      "alg": "ES256"
+      "agentpin_version": "1.0.0",
+      "entity": "example.com",
+      "entity_type": "organization",
+      "revocation_endpoint": "https://example.com/.well-known/agentpin/revocations.json",
+      "updated_at": "2025-01-01T00:00:00Z",
+      "agents": [
+        {
+          "agent_id": "coordinator",
+          "display_name": "Fleet Coordinator",
+          "status": "active",
+          "public_key_jwk": {
+            "kty": "EC",
+            "crv": "P-256",
+            "x": "PLACEHOLDER_X_COORDINATE",
+            "y": "PLACEHOLDER_Y_COORDINATE",
+            "kid": "fleet-key-01"
+          },
+          "capabilities": ["agent_coordination", "task_routing", "health_monitoring"],
+          "credential_ttl_max": "8760h"
+        },
+        {
+          "agent_id": "compliance_checker",
+          "status": "active",
+          "public_key_jwk": {
+            "kty": "EC",
+            "crv": "P-256",
+            "x": "PLACEHOLDER_X_COORDINATE",
+            "y": "PLACEHOLDER_Y_COORDINATE",
+            "kid": "fleet-key-01"
+          },
+          "capabilities": ["compliance_scanning", "report_generation"],
+          "credential_ttl_max": "8760h"
+        },
+        {
+          "agent_id": "chat_responder",
+          "status": "active",
+          "public_key_jwk": {
+            "kty": "EC",
+            "crv": "P-256",
+            "x": "PLACEHOLDER_X_COORDINATE",
+            "y": "PLACEHOLDER_Y_COORDINATE",
+            "kid": "fleet-key-01"
+          },
+          "capabilities": ["chat_response", "status_reporting"],
+          "credential_ttl_max": "8760h"
+        },
+        {
+          "agent_id": "data_processor",
+          "status": "active",
+          "public_key_jwk": {
+            "kty": "EC",
+            "crv": "P-256",
+            "x": "PLACEHOLDER_X_COORDINATE",
+            "y": "PLACEHOLDER_Y_COORDINATE",
+            "kid": "fleet-key-01"
+          },
+          "capabilities": ["data_ingestion", "transformation", "output_routing"],
+          "credential_ttl_max": "8760h"
+        }
+      ]
     }
   ],
-  "agents": [
-    {
-      "agent_id": "coordinator",
-      "kid": "fleet-key-01",
-      "capabilities": ["agent_coordination", "task_routing", "health_monitoring"]
-    },
-    {
-      "agent_id": "compliance_checker",
-      "kid": "fleet-key-01",
-      "capabilities": ["compliance_scanning", "report_generation"]
-    },
-    {
-      "agent_id": "chat_responder",
-      "kid": "fleet-key-01",
-      "capabilities": ["chat_response", "status_reporting"]
-    },
-    {
-      "agent_id": "data_processor",
-      "kid": "fleet-key-01",
-      "capabilities": ["data_ingestion", "transformation", "output_routing"]
-    }
-  ]
+  "revocations": []
 }

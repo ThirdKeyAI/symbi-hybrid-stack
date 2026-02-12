@@ -103,19 +103,45 @@ echo ""
 # --- 5. AgentPin verification ---
 echo "3. AgentPin Identity"
 if command -v agentpin &>/dev/null; then
-    if [ -f "$PROJECT_DIR/secrets/trust-bundle.json" ]; then
-        if agentpin verify --bundle "$PROJECT_DIR/secrets/trust-bundle.json" &>/dev/null; then
-            check "Trust bundle valid" "pass"
-        else
-            check "Trust bundle valid" "fail"
-        fi
+    TRUST_BUNDLE="$PROJECT_DIR/secrets/trust-bundle.json"
+    PIN_STORE="$PROJECT_DIR/secrets/pin-store.json"
+    REVOCATIONS="$PROJECT_DIR/secrets/revocations.json"
+
+    # Trust bundle exists
+    if [ -f "$TRUST_BUNDLE" ]; then
+        check "Trust bundle exists" "pass"
     else
         check "Trust bundle exists" "fail"
     fi
 
-    # Check key permissions
-    if [ -f "$PROJECT_DIR/secrets/fleet-key-01.jwk" ]; then
-        PERMS="$(stat -c '%a' "$PROJECT_DIR/secrets/fleet-key-01.jwk" 2>/dev/null || stat -f '%Lp' "$PROJECT_DIR/secrets/fleet-key-01.jwk" 2>/dev/null || echo "unknown")"
+    # Credential chain verification (pick first .jwt file)
+    first_jwt=""
+    for jwt_file in "$PROJECT_DIR"/secrets/*.jwt; do
+        [ -f "$jwt_file" ] || continue
+        first_jwt="$jwt_file"
+        break
+    done
+    if [ -n "$first_jwt" ] && [ -f "$TRUST_BUNDLE" ]; then
+        VERIFY_ARGS=(--trust-bundle "$TRUST_BUNDLE" --credential "$first_jwt")
+        if [ -f "$PIN_STORE" ]; then
+            VERIFY_ARGS+=(--pin-store "$PIN_STORE")
+        fi
+        if agentpin verify "${VERIFY_ARGS[@]}" &>/dev/null; then
+            check "Credential chain valid" "pass"
+        else
+            check "Credential chain valid" "fail"
+        fi
+    else
+        check "Credential chain valid (no jwt)" "fail"
+    fi
+
+    # Private key permissions
+    PRIVATE_KEY="$PROJECT_DIR/secrets/fleet-key-01.private.pem"
+    if [ ! -f "$PRIVATE_KEY" ]; then
+        PRIVATE_KEY="$PROJECT_DIR/secrets/fleet-key-01.jwk"
+    fi
+    if [ -f "$PRIVATE_KEY" ]; then
+        PERMS="$(stat -c '%a' "$PRIVATE_KEY" 2>/dev/null || stat -f '%Lp' "$PRIVATE_KEY" 2>/dev/null || echo "unknown")"
         if [ "$PERMS" = "600" ]; then
             check "Private key permissions (0600)" "pass"
         else
@@ -123,6 +149,29 @@ if command -v agentpin &>/dev/null; then
         fi
     else
         check "Fleet key exists" "fail"
+    fi
+
+    # Pin store permissions
+    if [ -f "$PIN_STORE" ]; then
+        PERMS="$(stat -c '%a' "$PIN_STORE" 2>/dev/null || stat -f '%Lp' "$PIN_STORE" 2>/dev/null || echo "unknown")"
+        if [ "$PERMS" = "600" ]; then
+            check "Pin store permissions (0600)" "pass"
+        else
+            check "Pin store permissions (got $PERMS)" "fail"
+        fi
+    else
+        printf "  %-40s SKIP (not initialized)\n" "Pin store"
+    fi
+
+    # Revocation document validity
+    if [ -f "$REVOCATIONS" ]; then
+        if python3 -c "import json; json.load(open('$REVOCATIONS'))" 2>/dev/null; then
+            check "Revocation document valid JSON" "pass"
+        else
+            check "Revocation document valid JSON" "fail"
+        fi
+    else
+        printf "  %-40s SKIP (not created)\n" "Revocation document"
     fi
 else
     check "AgentPin CLI available" "fail"

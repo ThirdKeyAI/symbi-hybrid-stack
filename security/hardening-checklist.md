@@ -22,9 +22,18 @@ Use this checklist before going to production. Each item reduces attack surface 
 ## Identity
 
 - [ ] Run `make keygen` to generate fresh AgentPin credentials
-- [ ] Publish `.well-known/agent-identity.json` on your domain
-- [ ] Verify credentials: `agentpin verify --bundle secrets/trust-bundle.json`
 - [ ] Set `AGENTPIN_DOMAIN` to your production domain
+- [ ] Initialize TOFU pin store: verify a credential with `--pin-store secrets/pin-store.json`
+- [ ] Confirm pin store permissions are `0600` (`ls -la secrets/pin-store.json`)
+- [ ] Create revocation document (`secrets/revocations.json`) and publish to revocation endpoint
+- [ ] Choose discovery method for your environment:
+  - Production (public): publish `.well-known/agent-identity.json` on your domain
+  - Air-gapped / enterprise: distribute trust bundles out-of-band
+  - CI/CD / dev: use `--discovery-dir` with local discovery files
+  - Fully disconnected: use `--offline --discovery <file>`
+- [ ] Verify credentials with correct method: `agentpin verify --trust-bundle secrets/trust-bundle.json --credential secrets/<agent>.jwt`
+- [ ] Monitor pin store for unexpected key changes (alerts on pin mismatch)
+- [ ] Back up pin store — loss requires re-pinning all keys
 
 ## Monitoring & Alerting
 

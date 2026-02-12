@@ -4,7 +4,7 @@
 
 | # | Threat | Impact | Mitigation | Status |
 |---|--------|--------|------------|--------|
-| 1 | **Agent Impersonation** | Attacker poses as a legitimate agent to execute unauthorized actions | AgentPin ES256 credentials bind agent identity to fleet key; `.well-known` discovery allows third-party verification; trust bundles for air-gapped environments | Mitigated |
+| 1 | **Agent Impersonation** | Attacker poses as a legitimate agent to execute unauthorized actions | AgentPin ES256 credentials bind agent identity to fleet key; five discovery methods (trust bundle, local directory, chain resolver, offline, online `.well-known`); TOFU key pinning detects unexpected key changes; three-level revocation (per-credential, per-key, per-issuer) enables immediate invalidation; mutual verification for agent-to-agent trust | Mitigated |
 | 2 | **Coordinator Takeover** | Attacker gains control of the coordinator to redirect all tasks | Bearer token auth on all HTTP endpoints; Cloudflare Tunnel restricts ingress to zero-trust paths; Cloud Run IAM for cloud coordinator; lease-based coordination prevents dual-active | Mitigated |
 | 3 | **Secret Exfiltration** | LLM API keys or auth tokens are leaked | Desktop: `.env` not committed, `0600` key permissions; Cloud: Secret Manager with IAM-scoped access; agent secrets policy limits per-agent access; audit logging of all access | Mitigated |
 | 4 | **Lateral Movement** | Compromised agent accesses other agents or services | Capability boundaries enforce strict isolation; deny lists block dangerous operations; network egress policy limits outbound connections per agent; no inter-agent communication | Mitigated |

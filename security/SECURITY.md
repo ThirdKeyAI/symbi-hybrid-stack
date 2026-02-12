@@ -18,7 +18,7 @@ External          Ingress              Coordinator          Agents
 
 1. **HTTP Bearer Token**: Every request to `/webhook` must include `Authorization: Bearer <token>`. Requests without valid tokens are rejected with 401.
 
-2. **AgentPin Identity**: Each agent has an ES256 credential (JWT) signed by the fleet key. The credential binds the agent's `agent_id` to the organization's domain via `.well-known/agent-identity.json`.
+2. **AgentPin Identity**: Each agent has an ES256 credential (JWT) signed by the fleet key. The credential binds the agent's `agent_id` to the organization's domain. Verification supports multiple discovery methods: trust bundles for air-gapped environments, local discovery directories for CI/CD, offline mode for fully disconnected operation, chain resolvers for layered fallbacks, and online `.well-known/agent-identity.json` for public-facing agents. TOFU key pinning (`--pin-store`) records public keys on first contact and rejects unexpected key changes. Three-level revocation (per-credential, per-key, per-issuer) enables immediate invalidation via offline revocation documents or online endpoints.
 
 3. **Cloud Run IAM**: Cloud services use Google IAM service accounts. Only the coordinator service account can invoke worker services.
 

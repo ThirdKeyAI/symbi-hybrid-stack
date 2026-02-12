@@ -1,10 +1,14 @@
 {
-  "schema_version": "0.2.0",
-  "domain": "example.com",
+  "agentpin_version": "1.0.0",
+  "entity": "example.com",
+  "entity_type": "organization",
+  "revocation_endpoint": "https://example.com/.well-known/agentpin/revocations.json",
+  "updated_at": "2025-01-01T00:00:00Z",
   "agents": [
     {
       "agent_id": "coordinator",
       "display_name": "Fleet Coordinator",
+      "status": "active",
       "public_key_jwk": {
         "kty": "EC",
         "crv": "P-256",
@@ -13,6 +17,7 @@
         "kid": "fleet-key-01"
       },
       "capabilities": ["agent_coordination", "task_routing", "health_monitoring"],
+      "credential_ttl_max": "8760h",
       "credential_endpoint": "https://example.com/.well-known/agentpin/credentials/coordinator.jwt"
     }
   ],
