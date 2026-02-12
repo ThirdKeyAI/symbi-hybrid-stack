@@ -184,4 +184,4 @@ See `security/SECURITY.md` for the full trust model and `security/threat-model.m
 
 ## License
 
-MIT — Copyright (c) 2025 ThirdKey.ai / Tarnover, LLC
+MIT — Copyright (c) 2025-2026 ThirdKey.ai / Tarnover, LLC

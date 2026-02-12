@@ -24,7 +24,7 @@ check_service() {
     local check="$2"
     local status
 
-    if eval "$check" &>/dev/null; then
+    if $check &>/dev/null; then
         status="healthy"
     else
         status="unhealthy"

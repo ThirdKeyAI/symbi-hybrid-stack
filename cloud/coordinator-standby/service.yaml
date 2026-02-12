@@ -1,3 +1,5 @@
+# Reference template — contains PROJECT_ID/REGION/REPO placeholders.
+# Not applied directly; deploy.sh uses Terraform or gcloud CLI instead.
 apiVersion: serving.knative.dev/v1
 kind: Service
 metadata:

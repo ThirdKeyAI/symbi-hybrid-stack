@@ -15,6 +15,7 @@ fi
 GCP_PROJECT="${GCP_PROJECT_ID:-}"
 GCP_REGION="${GCP_REGION:-us-central1}"
 BUCKET="${GCS_STATE_BUCKET:-}"
+REPO="${ARTIFACT_REGISTRY_REPO:-symbi}"
 
 echo "=== Cloud Teardown ==="
 echo ""
@@ -36,12 +37,12 @@ echo ""
 
 if command -v terraform &>/dev/null && [ -d "$PROJECT_DIR/cloud/terraform/.terraform" ]; then
     echo "Destroying with Terraform..."
-    cd "$PROJECT_DIR/cloud/terraform"
 
-    terraform destroy \
+    terraform -chdir="$PROJECT_DIR/cloud/terraform" destroy \
         -var="project_id=${GCP_PROJECT}" \
         -var="region=${GCP_REGION}" \
         -var="gcs_state_bucket=${BUCKET}" \
+        -var="artifact_registry_repo=${REPO}" \
         -var="auth_token=placeholder"
 else
     echo "Using gcloud to delete services..."

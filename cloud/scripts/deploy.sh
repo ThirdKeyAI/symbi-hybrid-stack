@@ -75,13 +75,12 @@ docker push "${REGISTRY}/worker-agent:latest"
 echo ""
 if command -v terraform &>/dev/null; then
     echo "Deploying with Terraform..."
-    cd cloud/terraform
 
-    terraform init \
+    terraform -chdir="$PROJECT_DIR/cloud/terraform" init \
         -backend-config="bucket=${BUCKET}" \
         -backend-config="prefix=terraform/state"
 
-    terraform apply \
+    terraform -chdir="$PROJECT_DIR/cloud/terraform" apply \
         -var="project_id=${GCP_PROJECT}" \
         -var="region=${GCP_REGION}" \
         -var="gcs_state_bucket=${BUCKET}" \
@@ -90,7 +89,7 @@ if command -v terraform &>/dev/null; then
 
     echo ""
     echo "Terraform outputs:"
-    terraform output
+    terraform -chdir="$PROJECT_DIR/cloud/terraform" output
 else
     echo "Terraform not found — falling back to gcloud..."
 

@@ -22,6 +22,14 @@ fi
 TUNNEL_TOKEN="${CLOUDFLARE_TUNNEL_TOKEN:-}"
 CONFIG_FILE="$SCRIPT_DIR/config.yml"
 
+# Kill orphaned cloudflared if interrupted before PID file is written
+cleanup_tunnel() {
+    if [ -n "${TUNNEL_PID:-}" ] && kill -0 "$TUNNEL_PID" 2>/dev/null; then
+        kill "$TUNNEL_PID" 2>/dev/null || true
+    fi
+}
+trap cleanup_tunnel INT TERM
+
 # --- Option 1: Token-based tunnel (recommended) ---
 if [ -n "$TUNNEL_TOKEN" ]; then
     echo "Starting Cloudflare Tunnel with token..."
@@ -29,6 +37,7 @@ if [ -n "$TUNNEL_TOKEN" ]; then
     TUNNEL_PID=$!
     echo "Tunnel started (PID: $TUNNEL_PID)"
     echo "$TUNNEL_PID" > "$PROJECT_DIR/.tunnel.pid"
+    trap - INT TERM
     echo "Tunnel is running. Use 'kill $TUNNEL_PID' or 'make desktop-down' to stop."
     exit 0
 fi
@@ -40,6 +49,7 @@ if [ -f "$CONFIG_FILE" ]; then
     TUNNEL_PID=$!
     echo "Tunnel started (PID: $TUNNEL_PID)"
     echo "$TUNNEL_PID" > "$PROJECT_DIR/.tunnel.pid"
+    trap - INT TERM
     echo "Tunnel is running. Use 'kill $TUNNEL_PID' or 'make desktop-down' to stop."
     exit 0
 fi

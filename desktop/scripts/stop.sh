@@ -14,7 +14,7 @@ if [ -f "$PROJECT_DIR/.tunnel.pid" ]; then
     if kill -0 "$TUNNEL_PID" 2>/dev/null; then
         echo "Stopping Cloudflare Tunnel (PID: $TUNNEL_PID)..."
         kill "$TUNNEL_PID" 2>/dev/null || true
-        wait "$TUNNEL_PID" 2>/dev/null || true
+        sleep 1
     fi
     rm -f "$PROJECT_DIR/.tunnel.pid"
 fi

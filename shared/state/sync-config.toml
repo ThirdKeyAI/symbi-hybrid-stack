@@ -1,5 +1,6 @@
-# State Synchronization Configuration
-# Litestream replicates the SQLite database to GCS for cloud failover.
+# State Synchronization Configuration — design reference only.
+# Actual Litestream replication is configured in desktop/litestream.yml.
+# This file documents the intended sync parameters and conflict policy.
 
 [replication]
 # GCS bucket for state replication (set via GCS_STATE_BUCKET env var)
