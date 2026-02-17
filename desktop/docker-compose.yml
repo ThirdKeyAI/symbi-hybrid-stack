@@ -19,6 +19,7 @@ services:
       - ./agents:/etc/symbi/agents:ro
       - ./symbi.toml:/etc/symbi/symbi.toml:ro
       - ./policies:/etc/symbi/policies:ro
+      - symbi-memory:/var/lib/symbi/memory
     command:
       - "up"
       - "--port"
@@ -97,6 +98,8 @@ services:
 volumes:
   symbi-data:
     name: symbi-data
+  symbi-memory:
+    name: symbi-memory
   qdrant-data:
     name: symbi-qdrant-data
 

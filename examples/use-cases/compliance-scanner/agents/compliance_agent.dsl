@@ -1,6 +1,18 @@
 agent compliance_agent(body: JSON) -> Report {
     capabilities = ["compliance_scanning", "report_generation"]
 
+    schedule {
+        cron "0 6 * * *"
+        max_jitter 300
+        max_concurrent 1
+    }
+
+    memory {
+        store markdown
+        path  "/var/lib/symbi/memory/compliance"
+        retention 2555d
+    }
+
     constraints {
         deny_capabilities: [
             "code_execution",

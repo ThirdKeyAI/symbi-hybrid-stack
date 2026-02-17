@@ -1,6 +1,13 @@
 agent data_processor(body: JSON) -> Result {
     capabilities = ["data_ingestion", "transformation", "output_routing"]
 
+    webhook {
+        provider custom
+        secret   $SYMBI_AUTH_TOKEN
+        path     "/hooks/data"
+        filter   ["ingest", "transform"]
+    }
+
     constraints {
         deny_capabilities: [
             "code_execution",

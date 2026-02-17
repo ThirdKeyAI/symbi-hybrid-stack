@@ -1,6 +1,13 @@
 agent support_bot(body: JSON) -> Response {
     capabilities = ["chat_response", "status_reporting", "report_generation"]
 
+    webhook {
+        provider slack
+        secret   $SLACK_SIGNING_SECRET
+        path     "/hooks/slack"
+        filter   ["message", "app_mention"]
+    }
+
     constraints {
         deny_capabilities: [
             "code_execution",

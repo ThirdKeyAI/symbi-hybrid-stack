@@ -6,11 +6,20 @@ hot_reload = false
 
 [http]
 enabled = true
+bind_address = "0.0.0.0"
 port = 8081
 path = "/webhook"
-cors = false
+cors_origins = []
 audit = true
 max_body_bytes = 1048576   # 1 MB
+
+[metrics]
+enabled = true
+export_interval = 60
+
+[skills]
+scan_enabled = true
+require_signed = false
 
 [storage]
 type = "sqlite"
