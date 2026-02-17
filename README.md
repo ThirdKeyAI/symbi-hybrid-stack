@@ -171,6 +171,17 @@ See `shared/agents/README.md` for the DSL capabilities reference.
 | `make keygen` | Generate/rotate AgentPin identity keys |
 | `make logs` | Tail logs from all services |
 
+## v1.4.0 Features
+
+This stack leverages Symbiont v1.4.0 capabilities:
+
+- **Persistent Memory** — Coordinator and compliance agents use `memory {}` blocks for Markdown-backed persistence with configurable retention
+- **Webhook Verification** — All webhook endpoints use `webhook {}` blocks with HMAC-SHA256 signature verification (Slack preset for chat_responder, custom for data ingestion)
+- **Native Scheduling** — Compliance checker runs on a `schedule {}` block (`cron "0 6 * * *"`) — no external cron required
+- **Skill Scanning** — ClawHavoc scanner enabled by default, verifying agent skills on load
+- **Metrics Telemetry** — `/api/v1/metrics` endpoint with file-based export for monitoring
+- **HTTP Security Hardening** — Loopback-only binding, explicit CORS allow-lists, audit logging
+
 ## Security Model
 
 Every agent in the fleet has a cryptographic identity via [AgentPin](https://agentpin.org):
@@ -179,6 +190,7 @@ Every agent in the fleet has a cryptographic identity via [AgentPin](https://age
 - **TOFU key pinning** records public keys on first contact and rejects unexpected changes
 - **Three-level revocation** — per-credential, per-key, per-issuer — with offline and online distribution
 - **Trust bundles** for air-gapped and enterprise verification
+- **Webhook signature verification** — HMAC-SHA256 with constant-time comparison; built-in presets for GitHub, Stripe, and Slack
 - **Audit logging** of all agent actions with credential chains
 - **Policy DSL** for network egress, secret access, and audit rules
 

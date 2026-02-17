@@ -1,6 +1,19 @@
 agent pipeline_agent(body: JSON) -> Result {
     capabilities = ["data_ingestion", "transformation", "output_routing"]
 
+    webhook {
+        provider custom
+        secret   $PIPELINE_WEBHOOK_SECRET
+        path     "/hooks/pipeline"
+        filter   ["ingest"]
+    }
+
+    memory {
+        store markdown
+        path  "/var/lib/symbi/memory/pipeline"
+        retention 90d
+    }
+
     constraints {
         deny_capabilities: [
             "code_execution",

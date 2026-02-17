@@ -1,4 +1,4 @@
-.PHONY: init desktop-up desktop-down cloud-deploy cloud-teardown verify keygen logs help
+.PHONY: init desktop-up desktop-down cloud-deploy cloud-teardown verify keygen logs console-logs help
 
 SHELL := /bin/bash
 ROOT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
@@ -39,3 +39,6 @@ keygen: ## Generate/rotate AgentPin identity keys
 
 logs: ## Tail logs from all services
 	@docker compose -f $(ROOT_DIR)/desktop/docker-compose.yml logs -f --tail=100
+
+console-logs: ## Tail logs from operations console
+	@docker compose -f $(ROOT_DIR)/desktop/docker-compose.yml logs -f --tail=100 a2ui

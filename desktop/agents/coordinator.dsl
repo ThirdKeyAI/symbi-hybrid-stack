@@ -1,6 +1,19 @@
 agent coordinator(body: JSON) -> Status {
     capabilities = ["agent_coordination", "task_routing", "health_monitoring"]
 
+    memory {
+        store markdown
+        path  "/var/lib/symbi/memory/coordinator"
+        retention 365d
+    }
+
+    webhook {
+        provider custom
+        secret   $SYMBI_AUTH_TOKEN
+        path     "/webhook"
+        filter   ["task", "health", "failover"]
+    }
+
     constraints {
         deny_capabilities: [
             "code_execution",

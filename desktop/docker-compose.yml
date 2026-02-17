@@ -19,6 +19,7 @@ services:
       - ./agents:/etc/symbi/agents:ro
       - ./symbi.toml:/etc/symbi/symbi.toml:ro
       - ./policies:/etc/symbi/policies:ro
+      - symbi-memory:/var/lib/symbi/memory
     command:
       - "up"
       - "--port"
@@ -57,6 +58,27 @@ services:
     networks:
       - symbi-net
 
+  a2ui:
+    image: ghcr.io/thirdkeyai/symbi-a2ui:latest
+    build:
+      context: ../../symbiont/crates/symbi-a2ui
+      dockerfile: Dockerfile
+    container_name: symbi-a2ui
+    restart: unless-stopped
+    ports:
+      - "${A2UI_PORT:-3001}:3001"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3001/ >/dev/null 2>&1 || exit 1"]
+      interval: 30s
+      timeout: 5s
+      start_period: 5s
+      retries: 3
+    networks:
+      - symbi-net
+    depends_on:
+      symbi:
+        condition: service_healthy
+
   litestream:
     image: litestream/litestream:latest
     container_name: symbi-litestream
@@ -76,6 +98,8 @@ services:
 volumes:
   symbi-data:
     name: symbi-data
+  symbi-memory:
+    name: symbi-memory
   qdrant-data:
     name: symbi-qdrant-data
 
