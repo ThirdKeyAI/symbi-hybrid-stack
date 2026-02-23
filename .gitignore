@@ -23,6 +23,10 @@ data/vector_db/
 .terraform.lock.hcl
 terraform.tfvars
 
+# Testing reports (local only)
+TESTING.md
+TESTING-FIXED.md
+
 # OS
 .DS_Store
 Thumbs.db
