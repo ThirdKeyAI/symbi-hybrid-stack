@@ -13,11 +13,11 @@ Part of the [ThirdKey](https://thirdkey.ai) trust stack: **SchemaPin → AgentPi
 │  ┌──────────── Desktop (primary) ────────────┐                  │
 │  │                                           │                  │
 │  │  Docker Compose                           │                  │
-│  │  ┌─────────┐ ┌──────────┐ ┌────────────┐ │                   │
-│  │  │  Symbi  │ │  LanceDB │ │ Litestream │ │                   │
-│  │  │ :8080/  │ │(embedded)│ │ SQLite→GCS │ │                   │
-│  │  │  8081   │ │          │ │            │ │                   │
-│  │  └────┬────┘ └──────────┘ └────────────┘ │                   │
+│  │  ┌─────────┐ ┌──────────┐                │                   │
+│  │  │  Symbi  │ │  LanceDB │                │                   │
+│  │  │ :8080/  │ │(embedded)│  + Litestream  │                   │
+│  │  │  8081   │ │          │  (opt-in GCS)  │                   │
+│  │  └────┬────┘ └──────────┘                │                   │
 │  │       │                                   │                  │
 │  │  ┌────┴──────────┐                        │                  │
 │  │  │  Cloudflare   │                        │                  │
@@ -116,7 +116,14 @@ make cloud-deploy
 make verify
 ```
 
-The cloud coordinator starts at min-instances=0 (costs nothing at idle). Workers scale to 10 instances via Pub/Sub triggers. Litestream keeps state synchronized between desktop and cloud.
+The cloud coordinator starts at min-instances=0 (costs nothing at idle). Workers scale to 10 instances via Pub/Sub triggers.
+
+To enable Litestream state replication between desktop and cloud:
+
+```bash
+# Set GCS_STATE_BUCKET in .env, then start with replication profile
+make desktop-up-replicated
+```
 
 ## Scale Up (5 min)
 
@@ -138,16 +145,10 @@ See `shared/agents/README.md` for the DSL capabilities reference.
 
 ### Using Qdrant Instead of LanceDB
 
-If you prefer Qdrant as the vector backend:
+If you prefer Qdrant as the vector backend, use the Qdrant make target — it automatically configures the backend, host, and port:
 
 ```bash
-# 1. Start the stack with the Qdrant profile
 make desktop-up-qdrant
-
-# 2. Set vector backend in .env
-SYMBIONT_VECTOR_BACKEND=qdrant
-SYMBIONT_VECTOR_HOST=symbi-qdrant
-SYMBIONT_VECTOR_PORT=6333
 ```
 
 Qdrant runs as a separate container and exposes port 6333 internally. See `desktop/docker-compose.yml` for the full service definition.
@@ -185,6 +186,7 @@ Qdrant runs as a separate container and exposes port 6333 internally. See `deskt
 | `make cloud-teardown` | Destroy cloud resources |
 | `make verify` | Run health checks and security validation |
 | `make keygen` | Generate/rotate AgentPin identity keys |
+| `make desktop-up-replicated` | Start desktop stack with Litestream GCS replication |
 | `make desktop-up-qdrant` | Start desktop stack with Qdrant vector backend |
 | `make logs` | Tail logs from all services |
 

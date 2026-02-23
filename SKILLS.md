@@ -18,7 +18,7 @@ This file provides step-by-step procedures for AI agents operating on this repos
 
 1. Run `make desktop-up`
 2. Wait for health checks to pass (up to 60 seconds)
-3. Expected output: Three containers running (symbi, a2ui, litestream); LanceDB is embedded in symbi (no separate container)
+3. Expected output: Two containers running (symbi, a2ui); LanceDB is embedded in symbi (no separate container). Use `make desktop-up-replicated` to add Litestream GCS replication.
 4. Verify: `make verify` returns all-green health report
 5. Verify: `curl -s -H "Authorization: Bearer $SYMBI_AUTH_TOKEN" http://localhost:8081/webhook` returns 200
 

@@ -70,7 +70,7 @@ if [ -d "$AGENTS_DIR" ]; then
             --kid "$KID" \
             --issuer "$DOMAIN" \
             --agent-id "$agent_name" \
-            --capabilities "$(grep -oP 'capabilities\s*\[\K[^\]]+' "$dsl_file" 2>/dev/null | tr -d '"' | tr ',' ' ' || echo "")" \
+            --capabilities "$(grep -oP 'capabilities\s*=\s*\[\K[^\]]+' "$dsl_file" 2>/dev/null | tr -d '"' | tr ',' ' ' || echo "")" \
             --ttl 8760h \
             > "$OUTPUT_DIR/${agent_name}.jwt" 2>/dev/null || \
             echo "  Warning: could not issue credential for $agent_name (agentpin issue may not be available)"
