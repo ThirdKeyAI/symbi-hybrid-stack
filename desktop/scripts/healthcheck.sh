@@ -52,8 +52,12 @@ else
     check_service "symbi-http" "curl -sf -o /dev/null http://localhost:${HTTP_PORT}/webhook"
 fi
 
-# Check Qdrant
-check_service "qdrant" "curl -sf http://localhost:${QDRANT_PORT}/healthz"
+# Check Qdrant (only if container is running via --profile qdrant)
+if docker inspect symbi-qdrant &>/dev/null; then
+    check_service "qdrant" "curl -sf http://localhost:${QDRANT_PORT}/healthz"
+else
+    printf "  %-20s %s\n" "qdrant" "not configured (use --profile qdrant)"
+fi
 
 # Check Operations Console
 check_service "a2ui" "curl -sf -o /dev/null http://localhost:${A2UI_PORT}/"

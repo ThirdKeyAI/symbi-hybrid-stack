@@ -1,4 +1,4 @@
-.PHONY: init desktop-up desktop-down cloud-deploy cloud-teardown verify keygen logs console-logs help
+.PHONY: init desktop-up desktop-up-qdrant desktop-down cloud-deploy cloud-teardown verify keygen logs console-logs help
 
 SHELL := /bin/bash
 ROOT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
@@ -17,6 +17,14 @@ desktop-up: ## Start desktop Docker Compose stack
 	@echo "Waiting for services to be healthy..."
 	@bash $(ROOT_DIR)/desktop/scripts/healthcheck.sh
 	@echo "Desktop stack is running."
+
+desktop-up-qdrant: ## Start desktop stack with Qdrant vector backend
+	@echo "Starting desktop stack with Qdrant..."
+	@if [ -f $(ROOT_DIR)/.env ]; then set -a && source $(ROOT_DIR)/.env && set +a; fi && \
+		docker compose -f $(ROOT_DIR)/desktop/docker-compose.yml --profile qdrant up -d
+	@echo "Waiting for services to be healthy..."
+	@bash $(ROOT_DIR)/desktop/scripts/healthcheck.sh
+	@echo "Desktop stack is running (with Qdrant)."
 
 desktop-down: ## Stop desktop stack gracefully
 	@bash $(ROOT_DIR)/desktop/scripts/stop.sh

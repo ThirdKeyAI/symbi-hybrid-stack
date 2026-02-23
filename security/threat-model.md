@@ -16,7 +16,8 @@
 
 ### External-Facing
 - **HTTP API** (`:8081/webhook`): Protected by bearer token + TLS via Cloudflare Tunnel
-- **Qdrant** (`:6333`): Internal-only by default; not exposed through tunnel
+- **LanceDB** (embedded): No network surface; data stored at `/var/lib/symbi/vector`
+- **Qdrant** (`:6333`): Optional (`--profile qdrant`); internal-only if enabled
 - **Cloud Run endpoints**: IAM-protected, no unauthenticated access
 
 ### Internal

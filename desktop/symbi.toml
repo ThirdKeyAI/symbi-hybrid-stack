@@ -28,6 +28,21 @@ default_store = "markdown"
 default_path = "/var/lib/symbi/memory"
 default_retention = "90d"
 
+[vector]
+backend = "lancedb"
+data_path = "/var/lib/symbi/vector"
+collection = "symbiont_context"
+dimension = 384
+
+[compaction]
+enabled = true
+summarize_threshold = 0.70
+compress_threshold = 0.80
+archive_threshold = 0.85
+truncate_threshold = 0.90
+max_summary_tokens = 500
+min_items_to_compact = 5
+
 [storage]
 type = "sqlite"
 path = "/var/lib/symbi/symbi.db"

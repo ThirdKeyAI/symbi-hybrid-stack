@@ -19,7 +19,7 @@ ingress:
   #   originRequest:
   #     noTLSVerify: false
 
-  # Qdrant (optional — usually internal only)
+  # Qdrant (optional — only needed with --profile qdrant)
   # - hostname: qdrant.yourdomain.com
   #   service: http://localhost:6333
 
