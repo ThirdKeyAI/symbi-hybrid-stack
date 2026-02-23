@@ -5,12 +5,11 @@ services:
     image: ghcr.io/thirdkeyai/symbi:latest
     container_name: symbi-coordinator
     restart: unless-stopped
-    # Host networking: symbi's HTTP Input module binds 127.0.0.1 with no
-    # override flag. Host mode makes that reachable from the host machine.
-    # Port 8081 (HTTP API) is exposed directly on the host.
-    # Note: --port 8080 (gRPC) is accepted but not yet functional in the
-    # current symbi binary; symbi status uses this port internally.
-    network_mode: host
+    ports:
+      - "${SYMBI_API_PORT:-8080}:8080"
+      - "${SYMBI_HTTP_PORT:-8081}:8081"
+    networks:
+      - symbi-net
     environment:
       - HOME=/var/lib/symbi
       - SYMBIONT_MASTER_KEY=${SYMBIONT_MASTER_KEY}
@@ -27,6 +26,8 @@ services:
       - SYMBIONT_VECTOR_HOST=${SYMBIONT_VECTOR_HOST:-}
       - SYMBIONT_VECTOR_PORT=${SYMBIONT_VECTOR_PORT:-}
       - COMPOSIO_API_KEY=${COMPOSIO_API_KEY:-}
+      - SYMBIONT_API_TOKEN=${SYMBIONT_API_TOKEN:-${SYMBI_AUTH_TOKEN}}
+      - SYMBIONT_TRUSTED_PROXIES=${SYMBIONT_TRUSTED_PROXIES:-}
     volumes:
       - symbi-data:/var/lib/symbi
       - ./agents:/etc/symbi/agents:ro
@@ -40,6 +41,8 @@ services:
       - "8080"
       - "--http-port"
       - "8081"
+      - "--http-bind"
+      - "0.0.0.0"
       - "--http.token"
       - "${SYMBI_AUTH_TOKEN}"
       - "--http.audit"
@@ -79,10 +82,6 @@ services:
     restart: unless-stopped
     ports:
       - "${A2UI_PORT:-3001}:3001"
-    # extra_hosts maps "symbi" to the host IP so Caddy can reach the symbi
-    # service which runs in network_mode: host (not on Docker DNS).
-    extra_hosts:
-      - "symbi:host-gateway"
     volumes:
       - ./a2ui/Caddyfile:/etc/caddy/Caddyfile:ro
     healthcheck:

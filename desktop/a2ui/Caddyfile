@@ -1,20 +1,23 @@
 # Custom Caddyfile for symbi-a2ui
-# Overrides the baked-in config to proxy to the correct HTTP port (8081).
-# The default image targets symbi:8080 (gRPC), but the REST/management API
-# is served on --http-port 8081.
-#
-# DNS note: the symbi service uses network_mode: host, so Docker DNS cannot
-# resolve "symbi". The docker-compose.yml adds extra_hosts to map "symbi"
-# to the host gateway IP.
+# Proxies /api/* to the Runtime API on the symbi service (port 8080).
 
 :3001 {
 	handle /api/* {
-		reverse_proxy symbi:8081
+		reverse_proxy symbi:8080
 	}
 
 	handle {
-		root * /srv
-		file_server
+		root * /srv/www
+		encode gzip
 		try_files {path} /index.html
+		file_server
+	}
+
+	header {
+		X-Content-Type-Options nosniff
+		X-Frame-Options DENY
+		X-XSS-Protection "1; mode=block"
+		Referrer-Policy strict-origin-when-cross-origin
+		-Server
 	}
 }
