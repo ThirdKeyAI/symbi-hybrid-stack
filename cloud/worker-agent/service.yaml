@@ -29,6 +29,13 @@ spec:
               cpu: "1"
               memory: 512Mi
           env:
+            - name: HOME
+              value: /var/lib/symbi
+            - name: SYMBIONT_MASTER_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: symbiont-master-key
+                  key: latest
             - name: SYMBI_AUTH_TOKEN
               valueFrom:
                 secretKeyRef:

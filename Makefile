@@ -30,7 +30,7 @@ desktop-up-qdrant: ## Start desktop stack with Qdrant vector backend
 	@echo "Starting desktop stack with Qdrant..."
 	@if [ -f $(ROOT_DIR)/.env ]; then set -a && source $(ROOT_DIR)/.env && set +a; fi && \
 		SYMBIONT_VECTOR_BACKEND=qdrant \
-		SYMBIONT_VECTOR_HOST=symbi-qdrant \
+		SYMBIONT_VECTOR_HOST=localhost \
 		SYMBIONT_VECTOR_PORT=6333 \
 		docker compose -f $(ROOT_DIR)/desktop/docker-compose.yml --profile qdrant up -d
 	@echo "Waiting for services to be healthy..."

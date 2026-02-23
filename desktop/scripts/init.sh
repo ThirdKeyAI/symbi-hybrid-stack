@@ -56,7 +56,6 @@ set +a
 if [ -z "${SYMBI_AUTH_TOKEN:-}" ]; then
     echo "Generating SYMBI_AUTH_TOKEN..."
     TOKEN="symbi_$(openssl rand -hex 24)"
-    # Append token to .env
     if grep -q "^SYMBI_AUTH_TOKEN=" .env; then
         sed -i "s|^SYMBI_AUTH_TOKEN=.*|SYMBI_AUTH_TOKEN=${TOKEN}|" .env 2>/dev/null || sed -i '' "s|^SYMBI_AUTH_TOKEN=.*|SYMBI_AUTH_TOKEN=${TOKEN}|" .env
     else
@@ -65,6 +64,19 @@ if [ -z "${SYMBI_AUTH_TOKEN:-}" ]; then
     echo "  Token generated and saved to .env"
 else
     echo "SYMBI_AUTH_TOKEN already set."
+fi
+
+if [ -z "${SYMBIONT_MASTER_KEY:-}" ]; then
+    echo "Generating SYMBIONT_MASTER_KEY..."
+    MASTER_KEY="$(openssl rand -hex 32)"
+    if grep -q "^SYMBIONT_MASTER_KEY=" .env; then
+        sed -i "s|^SYMBIONT_MASTER_KEY=.*|SYMBIONT_MASTER_KEY=${MASTER_KEY}|" .env 2>/dev/null || sed -i '' "s|^SYMBIONT_MASTER_KEY=.*|SYMBIONT_MASTER_KEY=${MASTER_KEY}|" .env
+    else
+        echo "SYMBIONT_MASTER_KEY=${MASTER_KEY}" >> .env
+    fi
+    echo "  Encryption key generated and saved to .env"
+else
+    echo "SYMBIONT_MASTER_KEY already set."
 fi
 
 echo ""

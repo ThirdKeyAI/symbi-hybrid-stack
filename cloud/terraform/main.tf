@@ -44,6 +44,20 @@ resource "google_secret_manager_secret_version" "auth_token" {
   secret_data = var.auth_token
 }
 
+# Secret Manager — encryption key
+resource "google_secret_manager_secret" "master_key" {
+  secret_id = "symbiont-master-key"
+
+  replication {
+    auto {}
+  }
+}
+
+resource "google_secret_manager_secret_version" "master_key" {
+  secret      = google_secret_manager_secret.master_key.id
+  secret_data = var.master_key
+}
+
 # Secret Manager — LLM API key
 resource "google_secret_manager_secret" "llm_api_key" {
   secret_id = "openrouter-api-key"
@@ -79,6 +93,12 @@ resource "google_secret_manager_secret_iam_member" "coordinator_llm_key" {
   member    = "serviceAccount:${google_service_account.coordinator.email}"
 }
 
+resource "google_secret_manager_secret_iam_member" "coordinator_master_key" {
+  secret_id = google_secret_manager_secret.master_key.secret_id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.coordinator.email}"
+}
+
 # IAM — worker can read secrets
 resource "google_secret_manager_secret_iam_member" "worker_auth_token" {
   secret_id = google_secret_manager_secret.auth_token.secret_id
@@ -88,6 +108,12 @@ resource "google_secret_manager_secret_iam_member" "worker_auth_token" {
 
 resource "google_secret_manager_secret_iam_member" "worker_llm_key" {
   secret_id = google_secret_manager_secret.llm_api_key.secret_id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.worker.email}"
+}
+
+resource "google_secret_manager_secret_iam_member" "worker_master_key" {
+  secret_id = google_secret_manager_secret.master_key.secret_id
   role      = "roles/secretmanager.secretAccessor"
   member    = "serviceAccount:${google_service_account.worker.email}"
 }
@@ -125,6 +151,21 @@ resource "google_cloud_run_v2_service" "coordinator" {
           memory = "512Mi"
         }
         cpu_idle = false
+      }
+
+      env {
+        name  = "HOME"
+        value = "/var/lib/symbi"
+      }
+
+      env {
+        name = "SYMBIONT_MASTER_KEY"
+        value_source {
+          secret_key_ref {
+            secret  = google_secret_manager_secret.master_key.secret_id
+            version = "latest"
+          }
+        }
       }
 
       env {
@@ -208,6 +249,21 @@ resource "google_cloud_run_v2_service" "worker" {
           memory = "512Mi"
         }
         cpu_idle = false
+      }
+
+      env {
+        name  = "HOME"
+        value = "/var/lib/symbi"
+      }
+
+      env {
+        name = "SYMBIONT_MASTER_KEY"
+        value_source {
+          secret_key_ref {
+            secret  = google_secret_manager_secret.master_key.secret_id
+            version = "latest"
+          }
+        }
       }
 
       env {

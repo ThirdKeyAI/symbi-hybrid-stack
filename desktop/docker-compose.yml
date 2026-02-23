@@ -3,10 +3,13 @@ services:
     image: ghcr.io/thirdkeyai/symbi:latest
     container_name: symbi-coordinator
     restart: unless-stopped
-    ports:
-      - "${SYMBI_GRPC_PORT:-8080}:8080"
-      - "${SYMBI_HTTP_PORT:-8081}:8081"
+    # Host networking: symbi's HTTP Input module binds 127.0.0.1 with no
+    # override flag. Host mode makes that reachable from the host machine.
+    # Ports 8080 (gRPC) and 8081 (HTTP) are exposed directly on the host.
+    network_mode: host
     environment:
+      - HOME=/var/lib/symbi
+      - SYMBIONT_MASTER_KEY=${SYMBIONT_MASTER_KEY}
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
       - OPENROUTER_MODEL=${OPENROUTER_MODEL:-}
       - OPENAI_API_KEY=${OPENAI_API_KEY:-}
@@ -42,8 +45,6 @@ services:
       timeout: 10s
       start_period: 10s
       retries: 3
-    networks:
-      - symbi-net
     depends_on:
       qdrant:
         condition: service_healthy

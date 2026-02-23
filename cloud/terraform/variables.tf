@@ -31,3 +31,9 @@ variable "auth_token" {
   type        = string
   sensitive   = true
 }
+
+variable "master_key" {
+  description = "Symbiont encryption key for agent context persistence"
+  type        = string
+  sensitive   = true
+}
