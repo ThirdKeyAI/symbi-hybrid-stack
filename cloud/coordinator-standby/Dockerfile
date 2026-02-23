@@ -6,8 +6,9 @@ COPY cloud/coordinator-standby/symbi.toml /var/lib/symbi/symbi.toml
 COPY desktop/agents/ /etc/symbi/agents/
 COPY desktop/policies/ /etc/symbi/policies/
 
-# Cloud Run sets PORT environment variable
-ENV PORT=8081
+# Cloud Run sets PORT; HOME must point to a writable dir (no /home/symbi in image)
+ENV PORT=8081 HOME=/var/lib/symbi
 
-ENTRYPOINT ["/usr/local/bin/symbi"]
-CMD ["up", "--port", "8080", "--http-port", "8081", "--http.token", "env:SYMBI_AUTH_TOKEN", "--http.audit"]
+# Shell form for $SYMBI_AUTH_TOKEN expansion; exec replaces sh so symbi is PID 1
+ENTRYPOINT ["/bin/sh", "-c"]
+CMD ["exec /usr/local/bin/symbi up --port 8080 --http-port 8081 --http.token \"$SYMBI_AUTH_TOKEN\" --http.audit"]

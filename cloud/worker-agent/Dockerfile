@@ -7,7 +7,9 @@ COPY desktop/policies/ /etc/symbi/policies/
 
 # Workers process tasks from queue — no HTTP endpoint needed
 # Cloud Run requires a port listener, so we keep the HTTP server
-ENV PORT=8081
+# HOME must point to a writable dir (no /home/symbi in image)
+ENV PORT=8081 HOME=/var/lib/symbi
 
-ENTRYPOINT ["/usr/local/bin/symbi"]
-CMD ["up", "--port", "8080", "--http-port", "8081", "--http.token", "env:SYMBI_AUTH_TOKEN", "--http.audit"]
+# Shell form for $SYMBI_AUTH_TOKEN expansion; exec replaces sh so symbi is PID 1
+ENTRYPOINT ["/bin/sh", "-c"]
+CMD ["exec /usr/local/bin/symbi up --port 8080 --http-port 8081 --http.token \"$SYMBI_AUTH_TOKEN\" --http.audit"]

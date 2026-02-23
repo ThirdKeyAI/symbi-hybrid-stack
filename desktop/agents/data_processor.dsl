@@ -3,7 +3,7 @@ agent data_processor(body: JSON) -> Result {
 
     webhook {
         provider custom
-        secret   $SYMBI_AUTH_TOKEN
+        secret   $SYMBI_AUTH_TOKEN   // expanded by DSL runtime from environment
         path     "/hooks/data"
         filter   ["ingest", "transform"]
     }
