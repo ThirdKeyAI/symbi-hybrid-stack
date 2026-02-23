@@ -147,6 +147,11 @@ resource "google_cloud_run_v2_service" "coordinator" {
         }
       }
 
+      env {
+        name  = "SYMBIONT_VECTOR_BACKEND"
+        value = "lancedb"
+      }
+
       startup_probe {
         http_get {
           path = "/webhook"
@@ -223,6 +228,11 @@ resource "google_cloud_run_v2_service" "worker" {
             version = "latest"
           }
         }
+      }
+
+      env {
+        name  = "SYMBIONT_VECTOR_BACKEND"
+        value = "lancedb"
       }
     }
   }

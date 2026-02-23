@@ -8,8 +8,8 @@ policy network_egress {
         allow: [
             "api.openrouter.ai:443",
             "api.openai.com:443",
-            "api.anthropic.com:443",
-            "symbi-qdrant:6333"
+            "api.anthropic.com:443"
+            // "symbi-qdrant:6333"  # only needed with --profile qdrant
         ]
     }
 

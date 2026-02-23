@@ -22,10 +22,10 @@ RESULTS=()
 
 check_service() {
     local name="$1"
-    local check="$2"
+    shift
     local status
 
-    if $check &>/dev/null; then
+    if "$@" &>/dev/null; then
         status="healthy"
     else
         status="unhealthy"
@@ -40,31 +40,43 @@ echo "=== Health Check ==="
 echo ""
 
 # Check Docker
-check_service "docker" "docker info"
+check_service "docker" docker info
 
 # Check Symbi container
-check_service "symbi" "docker inspect --format='{{.State.Health.Status}}' symbi-coordinator 2>/dev/null | grep -q healthy"
+check_service "symbi" bash -c "docker inspect --format='{{.State.Health.Status}}' symbi-coordinator 2>/dev/null | grep -q healthy"
 
 # Check Symbi HTTP endpoint
 if [ -n "$TOKEN" ]; then
-    check_service "symbi-http" "curl -sf -o /dev/null -w '%{http_code}' -H 'Authorization: Bearer ${TOKEN}' http://localhost:${HTTP_PORT}/webhook -H 'Content-Type: application/json' -d '{\"ping\":true}'"
+    check_service "symbi-http" curl -sf -o /dev/null \
+        -H "Authorization: Bearer ${TOKEN}" \
+        -H "Content-Type: application/json" \
+        -d '{"ping":true}' \
+        "http://localhost:${HTTP_PORT}/webhook"
 else
-    check_service "symbi-http" "curl -sf -o /dev/null http://localhost:${HTTP_PORT}/webhook"
+    check_service "symbi-http" curl -sf -o /dev/null "http://localhost:${HTTP_PORT}/webhook"
 fi
 
-# Check Qdrant
-check_service "qdrant" "curl -sf http://localhost:${QDRANT_PORT}/healthz"
+# Check Qdrant (only if container is running via --profile qdrant)
+if docker inspect symbi-qdrant &>/dev/null; then
+    check_service "qdrant" curl -sf "http://localhost:${QDRANT_PORT}/healthz"
+else
+    printf "  %-20s %s\n" "qdrant" "not configured (use --profile qdrant)"
+fi
 
 # Check Operations Console
-check_service "a2ui" "curl -sf -o /dev/null http://localhost:${A2UI_PORT}/"
+check_service "a2ui" curl -sf -o /dev/null "http://localhost:${A2UI_PORT}/"
 
-# Check Litestream container
-check_service "litestream" "docker inspect --format='{{.State.Running}}' symbi-litestream 2>/dev/null | grep -q true"
+# Check Litestream container (only if running via --profile replication)
+if docker inspect symbi-litestream &>/dev/null; then
+    check_service "litestream" bash -c "docker inspect --format='{{.State.Running}}' symbi-litestream 2>/dev/null | grep -q true"
+else
+    printf "  %-20s %s\n" "litestream" "not configured (use --profile replication)"
+fi
 
 # Check Cloudflare Tunnel (if configured)
 if [ -f "$PROJECT_DIR/.tunnel.pid" ]; then
     TUNNEL_PID="$(cat "$PROJECT_DIR/.tunnel.pid")"
-    check_service "tunnel" "kill -0 $TUNNEL_PID 2>/dev/null"
+    check_service "tunnel" kill -0 "$TUNNEL_PID"
 else
     printf "  %-20s %s\n" "tunnel" "not configured"
 fi
@@ -72,6 +84,7 @@ fi
 echo ""
 
 # Output JSON report
+mkdir -p "$PROJECT_DIR/state"
 JSON_REPORT="{\"timestamp\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\",\"overall\":\"$([ $STATUS_OK -eq 0 ] && echo healthy || echo unhealthy)\",\"services\":[$(IFS=,; echo "${RESULTS[*]}")]}"
 echo "$JSON_REPORT" > "$PROJECT_DIR/state/health.json" 2>/dev/null || true
 

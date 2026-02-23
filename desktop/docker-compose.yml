@@ -14,12 +14,19 @@ services:
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
       - ANTHROPIC_MODEL=${ANTHROPIC_MODEL:-}
       - SYMBI_AUTH_TOKEN=${SYMBI_AUTH_TOKEN}
+      - SYMBIONT_VECTOR_BACKEND=${SYMBIONT_VECTOR_BACKEND:-lancedb}
+      - SYMBIONT_VECTOR_COLLECTION=${SYMBIONT_VECTOR_COLLECTION:-symbiont_context}
+      - SYMBIONT_VECTOR_DIMENSION=${SYMBIONT_VECTOR_DIMENSION:-384}
+      - SYMBIONT_VECTOR_HOST=${SYMBIONT_VECTOR_HOST:-}
+      - SYMBIONT_VECTOR_PORT=${SYMBIONT_VECTOR_PORT:-}
+      - COMPOSIO_API_KEY=${COMPOSIO_API_KEY:-}
     volumes:
       - symbi-data:/var/lib/symbi
       - ./agents:/etc/symbi/agents:ro
       - ./symbi.toml:/etc/symbi/symbi.toml:ro
       - ./policies:/etc/symbi/policies:ro
       - symbi-memory:/var/lib/symbi/memory
+      - symbi-vector:/var/lib/symbi/vector
     command:
       - "up"
       - "--port"
@@ -30,7 +37,7 @@ services:
       - "env:SYMBI_AUTH_TOKEN"
       - "--http.audit"
     healthcheck:
-      test: ["CMD", "symbi", "--version"]
+      test: ["CMD-SHELL", "curl -sf http://localhost:8081/webhook || exit 1"]
       interval: 30s
       timeout: 10s
       start_period: 10s
@@ -40,11 +47,14 @@ services:
     depends_on:
       qdrant:
         condition: service_healthy
+        required: false
 
   qdrant:
     image: qdrant/qdrant:latest
     container_name: symbi-qdrant
     restart: unless-stopped
+    profiles:
+      - qdrant
     ports:
       - "${QDRANT_PORT:-6333}:6333"
     volumes:
@@ -60,9 +70,6 @@ services:
 
   a2ui:
     image: ghcr.io/thirdkeyai/symbi-a2ui:latest
-    build:
-      context: ../../symbiont/crates/symbi-a2ui
-      dockerfile: Dockerfile
     container_name: symbi-a2ui
     restart: unless-stopped
     ports:
@@ -83,6 +90,8 @@ services:
     image: litestream/litestream:latest
     container_name: symbi-litestream
     restart: unless-stopped
+    profiles:
+      - replication
     environment:
       - GCS_STATE_BUCKET=${GCS_STATE_BUCKET:-}
     volumes:
@@ -100,6 +109,8 @@ volumes:
     name: symbi-data
   symbi-memory:
     name: symbi-memory
+  symbi-vector:
+    name: symbi-vector
   qdrant-data:
     name: symbi-qdrant-data
 

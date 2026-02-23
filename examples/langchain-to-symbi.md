@@ -12,7 +12,7 @@ This guide maps LangChain patterns to Symbiont equivalents.
 | Agent executor | Coordinator agent | Built-in task routing and coordination |
 | Output parser | Return type | `-> Report`, `-> Result`, `-> Response` |
 | Callback handler | `policy` audit block | Structured audit logging |
-| Vector store | Qdrant (bundled) | Qdrant runs as a service in Docker Compose |
+| Vector store | LanceDB (embedded) | Embedded vector search, no external service required |
 | `.env` / `dotenv` | `.env` + `symbi.toml` | Environment for secrets, TOML for config |
 
 ## Before: LangChain Chain

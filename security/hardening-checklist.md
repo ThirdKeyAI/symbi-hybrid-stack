@@ -14,7 +14,8 @@ Use this checklist before going to production. Each item reduces attack surface 
 ## Network
 
 - [ ] Enable Cloudflare Tunnel for desktop ingress (no open ports)
-- [ ] Disable Qdrant external port binding if not needed externally
+- [ ] Qdrant runs only with `--profile qdrant`; if enabled, disable external port binding
+- [ ] Verify LanceDB data directory permissions (`/var/lib/symbi/vector`)
 - [ ] Review `desktop/policies/network.policy.dsl` — remove unused egress rules
 - [ ] Enable Cloud Armor WAF on Cloud Run services (cloud)
 - [ ] Configure VPC connector for Cloud Run (private networking)

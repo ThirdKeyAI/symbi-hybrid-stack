@@ -13,11 +13,11 @@ Part of the [ThirdKey](https://thirdkey.ai) trust stack: **SchemaPin → AgentPi
 │  ┌──────────── Desktop (primary) ────────────┐                  │
 │  │                                           │                  │
 │  │  Docker Compose                           │                  │
-│  │  ┌─────────┐ ┌────────┐ ┌────────────┐    │                  │
-│  │  │  Symbi  │ │ Qdrant │ │ Litestream │    │                  │
-│  │  │ :8080/  │ │ :6333  │ │ SQLite→GCS │    │                  │
-│  │  │  8081   │ │        │ │            │    │                  │
-│  │  └────┬────┘ └────────┘ └────────────┘    │                  │
+│  │  ┌─────────┐ ┌──────────┐                │                   │
+│  │  │  Symbi  │ │  LanceDB │                │                   │
+│  │  │ :8080/  │ │(embedded)│  + Litestream  │                   │
+│  │  │  8081   │ │          │  (opt-in GCS)  │                   │
+│  │  └────┬────┘ └──────────┘                │                   │
 │  │       │                                   │                  │
 │  │  ┌────┴──────────┐                        │                  │
 │  │  │  Cloudflare   │                        │                  │
@@ -116,7 +116,14 @@ make cloud-deploy
 make verify
 ```
 
-The cloud coordinator starts at min-instances=0 (costs nothing at idle). Workers scale to 10 instances via Pub/Sub triggers. Litestream keeps state synchronized between desktop and cloud.
+The cloud coordinator starts at min-instances=0 (costs nothing at idle). Workers scale to 10 instances via Pub/Sub triggers.
+
+To enable Litestream state replication between desktop and cloud:
+
+```bash
+# Set GCS_STATE_BUCKET in .env, then start with replication profile
+make desktop-up-replicated
+```
 
 ## Scale Up (5 min)
 
@@ -135,6 +142,16 @@ make desktop-down && make desktop-up
 ```
 
 See `shared/agents/README.md` for the DSL capabilities reference.
+
+### Using Qdrant Instead of LanceDB
+
+If you prefer Qdrant as the vector backend, use the Qdrant make target — it automatically configures the backend, host, and port:
+
+```bash
+make desktop-up-qdrant
+```
+
+Qdrant runs as a separate container and exposes port 6333 internally. See `desktop/docker-compose.yml` for the full service definition.
 
 ## Project Structure
 
@@ -169,18 +186,22 @@ See `shared/agents/README.md` for the DSL capabilities reference.
 | `make cloud-teardown` | Destroy cloud resources |
 | `make verify` | Run health checks and security validation |
 | `make keygen` | Generate/rotate AgentPin identity keys |
+| `make desktop-up-replicated` | Start desktop stack with Litestream GCS replication |
+| `make desktop-up-qdrant` | Start desktop stack with Qdrant vector backend |
 | `make logs` | Tail logs from all services |
 
-## v1.4.0 Features
+## v1.5.0 Features
 
-This stack leverages Symbiont v1.4.0 capabilities:
+This stack leverages Symbiont v1.5.0 capabilities:
 
+- **Embedded Vector Search** — LanceDB replaces Qdrant as the default vector backend; no external service required. Qdrant remains available via `--profile qdrant`
+- **Context Compaction** — Automatic four-tier pipeline (summarize → compress → archive → truncate) manages context pressure at configurable thresholds
+- **Composio MCP Integration** — Optional Composio API key enables MCP tool integrations for agents
+- **Multi-Model Token Counting** — Accurate token budgeting across OpenRouter, OpenAI, and Anthropic models
 - **Persistent Memory** — Coordinator and compliance agents use `memory {}` blocks for Markdown-backed persistence with configurable retention
-- **Webhook Verification** — All webhook endpoints use `webhook {}` blocks with HMAC-SHA256 signature verification (Slack preset for chat_responder, custom for data ingestion)
+- **Webhook Verification** — All webhook endpoints use `webhook {}` blocks with HMAC-SHA256 signature verification
 - **Native Scheduling** — Compliance checker runs on a `schedule {}` block (`cron "0 6 * * *"`) — no external cron required
-- **Skill Scanning** — ClawHavoc scanner enabled by default, verifying agent skills on load
 - **Metrics Telemetry** — `/api/v1/metrics` endpoint with file-based export for monitoring
-- **HTTP Security Hardening** — Loopback-only binding, explicit CORS allow-lists, audit logging
 
 ## Security Model
 

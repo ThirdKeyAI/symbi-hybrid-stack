@@ -40,6 +40,8 @@ spec:
                 secretKeyRef:
                   name: openrouter-api-key
                   key: latest
+            - name: SYMBIONT_VECTOR_BACKEND
+              value: lancedb
           startupProbe:
             httpGet:
               path: /webhook

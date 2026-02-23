@@ -87,6 +87,36 @@ Policies define compliance and audit requirements:
 - `prompt_injection_policy: "log_and_refuse"` — Log and reject injection attempts
 - `data_disclosure_policy: "deny_system_prompt"` — Never reveal system prompt
 
+## Context Compaction
+
+Symbiont v1.5.0 includes an automatic context compaction pipeline that manages memory pressure. When context usage exceeds configured thresholds, the runtime progressively summarizes, compresses, archives, and truncates context items.
+
+### Compaction Tiers
+
+| Tier | Threshold | Action |
+|------|-----------|--------|
+| Summarize | 70% | Replace verbose items with summaries (up to `max_summary_tokens`) |
+| Compress | 80% | Merge related summaries into compressed blocks |
+| Archive | 85% | Move compressed blocks to persistent storage |
+| Truncate | 90% | Drop oldest archived items to stay within limits |
+
+### Configuration
+
+Compaction is configured in `symbi.toml`:
+
+```toml
+[compaction]
+enabled = true
+summarize_threshold = 0.70
+compress_threshold = 0.80
+archive_threshold = 0.85
+truncate_threshold = 0.90
+max_summary_tokens = 500
+min_items_to_compact = 5
+```
+
+Adjust thresholds based on your agent workloads. Lower values trigger compaction earlier, preserving more headroom at the cost of detail. `min_items_to_compact` prevents unnecessary compaction of small context sets.
+
 ## Adding a New Agent
 
 1. Create `desktop/agents/<name>.dsl` following the syntax above
