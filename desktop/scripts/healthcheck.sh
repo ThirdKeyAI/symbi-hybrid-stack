@@ -63,8 +63,20 @@ else
     printf "  %-20s %s\n" "qdrant" "not configured (use --profile qdrant)"
 fi
 
-# Check Operations Console
+# Check Operations Console (static SPA)
 check_service "a2ui" curl -sf -o /dev/null "http://localhost:${A2UI_PORT}/"
+
+# Check a2ui API proxy (should reach symbi:8081 via extra_hosts + Caddyfile)
+if curl -sf -o /dev/null "http://localhost:${A2UI_PORT}/" 2>/dev/null; then
+    # Only check proxy if the SPA is up — avoids misleading "unhealthy" when a2ui is down
+    if curl -sf -o /dev/null -w '' "http://localhost:${A2UI_PORT}/api/v1/health" 2>/dev/null; then
+        printf "  %-20s %s\n" "a2ui-api-proxy" "healthy"
+        RESULTS+=("{\"service\":\"a2ui-api-proxy\",\"status\":\"healthy\"}")
+    else
+        printf "  %-20s %s\n" "a2ui-api-proxy" "unreachable (symbi API may not serve /api/v1/*)"
+        RESULTS+=("{\"service\":\"a2ui-api-proxy\",\"status\":\"warning\"}")
+    fi
+fi
 
 # Check Litestream container (only if running via --profile replication)
 if docker inspect symbi-litestream &>/dev/null; then

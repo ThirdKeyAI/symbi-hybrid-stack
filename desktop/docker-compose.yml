@@ -7,7 +7,9 @@ services:
     restart: unless-stopped
     # Host networking: symbi's HTTP Input module binds 127.0.0.1 with no
     # override flag. Host mode makes that reachable from the host machine.
-    # Ports 8080 (gRPC) and 8081 (HTTP) are exposed directly on the host.
+    # Port 8081 (HTTP API) is exposed directly on the host.
+    # Note: --port 8080 (gRPC) is accepted but not yet functional in the
+    # current symbi binary; symbi status uses this port internally.
     network_mode: host
     environment:
       - HOME=/var/lib/symbi
@@ -77,6 +79,12 @@ services:
     restart: unless-stopped
     ports:
       - "${A2UI_PORT:-3001}:3001"
+    # extra_hosts maps "symbi" to the host IP so Caddy can reach the symbi
+    # service which runs in network_mode: host (not on Docker DNS).
+    extra_hosts:
+      - "symbi:host-gateway"
+    volumes:
+      - ./a2ui/Caddyfile:/etc/caddy/Caddyfile:ro
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:3001/ >/dev/null 2>&1 || exit 1"]
       interval: 30s
