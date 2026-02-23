@@ -23,7 +23,7 @@ services:
     volumes:
       - symbi-data:/var/lib/symbi
       - ./agents:/etc/symbi/agents:ro
-      - ./symbi.toml:/etc/symbi/symbi.toml:ro
+      - ./symbi.toml:/var/lib/symbi/symbi.toml:ro
       - ./policies:/etc/symbi/policies:ro
       - symbi-memory:/var/lib/symbi/memory
       - symbi-vector:/var/lib/symbi/vector
@@ -37,7 +37,7 @@ services:
       - "env:SYMBI_AUTH_TOKEN"
       - "--http.audit"
     healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://localhost:8081/webhook || exit 1"]
+      test: ["CMD-SHELL", "grep -q ':1F91 ' /proc/net/tcp 2>/dev/null || grep -q ':1F91 ' /proc/net/tcp6 2>/dev/null || exit 1"]
       interval: 30s
       timeout: 10s
       start_period: 10s
