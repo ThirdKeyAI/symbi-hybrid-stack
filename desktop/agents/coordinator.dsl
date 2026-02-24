@@ -9,7 +9,7 @@ agent coordinator(body: JSON) -> Status {
 
     webhook {
         provider custom
-        secret   $SYMBI_AUTH_TOKEN   // expanded by DSL runtime from environment
+        secret   "changeme"          // replace with your webhook HMAC secret
         path     "/webhook"
         filter   ["task", "health", "failover"]
     }

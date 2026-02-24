@@ -1,8 +1,8 @@
-# Tip: pin image tags in production (e.g. ghcr.io/thirdkeyai/symbi:1.5.0)
-# to prevent uncontrolled upgrades on `docker compose pull`.
+# ThirdKey images pinned to 1.5.0. Third-party images (qdrant, litestream)
+# left at :latest — update them independently as needed.
 services:
   symbi:
-    image: ghcr.io/thirdkeyai/symbi:latest
+    image: ghcr.io/thirdkeyai/symbi:1.5.0
     container_name: symbi-coordinator
     restart: unless-stopped
     ports:
@@ -77,7 +77,7 @@ services:
       - symbi-net
 
   a2ui:
-    image: ghcr.io/thirdkeyai/symbi-a2ui:latest
+    image: ghcr.io/thirdkeyai/symbi-a2ui:1.5.0
     container_name: symbi-a2ui
     restart: unless-stopped
     ports:
@@ -114,6 +114,10 @@ services:
     networks:
       - symbi-net
 
+# Named volumes are created automatically on first `docker compose up`.
+# If they already exist from a previous project name, Docker Compose may
+# print "volume ... already exists but was not created by Docker Compose".
+# This warning is cosmetic and safe to ignore.
 volumes:
   symbi-data:
     name: symbi-data
