@@ -53,7 +53,7 @@ else
 fi
 
 # --- 2. Rejection test: invalid token rejected ---
-HTTP_CODE="$(curl -sf -o /dev/null -w '%{http_code}' \
+HTTP_CODE="$(curl -s -o /dev/null -w '%{http_code}' \
     -H "Authorization: Bearer invalid_token_12345" \
     -H "Content-Type: application/json" \
     "${BASE_URL}/webhook" \
@@ -67,7 +67,7 @@ else
 fi
 
 # --- 3. No-auth test: missing token rejected ---
-HTTP_CODE="$(curl -sf -o /dev/null -w '%{http_code}' \
+HTTP_CODE="$(curl -s -o /dev/null -w '%{http_code}' \
     -H "Content-Type: application/json" \
     "${BASE_URL}/webhook" \
     -d '{"ping":true}' 2>/dev/null || echo "000")"
@@ -176,7 +176,7 @@ if command -v agentpin &>/dev/null; then
         printf "  %-40s SKIP (not created)\n" "Revocation document"
     fi
 else
-    check "AgentPin CLI available" "fail"
+    printf "  %-40s SKIP (CLI not installed)\n" "AgentPin identity"
 fi
 
 echo ""
@@ -191,7 +191,7 @@ if docker inspect symbi-litestream &>/dev/null 2>&1; then
         check "Litestream running" "fail"
     fi
 else
-    check "Litestream container exists" "fail"
+    printf "  %-40s SKIP (use --profile replication)\n" "Litestream"
 fi
 
 echo ""
