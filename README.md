@@ -13,11 +13,11 @@ Part of the [ThirdKey](https://thirdkey.ai) trust stack: **SchemaPin → AgentPi
 │  ┌──────────── Desktop (primary) ────────────┐                  │
 │  │                                           │                  │
 │  │  Docker Compose                           │                  │
-│  │  ┌─────────┐ ┌──────────┐ ┌────────┐     │                   │
-│  │  │  Symbi  │ │  LanceDB │ │  a2ui  │     │                   │
-│  │  │  :8081  │ │(embedded)│ │ :3001  │     │                   │
-│  │  │  (HTTP) │ │          │ │(dashboard)   │                   │
-│  │  └────┬────┘ └──────────┘ └────────┘     │                   │
+│  │  ┌─────────┐ ┌──────────┐ ┌────────┐      │                  │
+│  │  │  Symbi  │ │  LanceDB │ │  a2ui  │      │                  │
+│  │  │  :8081  │ │(embedded)│ │ :3001  │      │                  │
+│  │  │  (HTTP) │ │          │ │(dashboard)    │                  │
+│  │  └────┬────┘ └──────────┘ └────────┘      │                  │
 │  │       │                                   │                  │
 │  │  ┌────┴──────────┐                        │                  │
 │  │  │  Cloudflare   │                        │                  │
