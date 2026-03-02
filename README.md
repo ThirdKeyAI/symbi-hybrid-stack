@@ -219,4 +219,4 @@ See `security/SECURITY.md` for the full trust model and `security/threat-model.m
 
 ## License
 
-Apache 2.0 — Copyright (c) 2025-2026 ThirdKey.ai / Tarnover, LLC
+Apache 2.0 — Copyright (c) 2024-2026 Jascha Wanger / ThirdKey AI
